@@ -21,8 +21,8 @@ class Game {
 
         this.currentShape = null;
         this.difficulty = "beginner";
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        this.width = window.innerWidth / 1.10;
+        this.height = window.innerHeight / 1.20;
     }
 
     setup() {
@@ -74,7 +74,7 @@ class Game {
     }
 
     draw() {
-        background(255);
+        background("#faebd7");
 
         if (this.gameState === GAME_STATES.SHOWING_TARGET) {
             this.drawing.drawTarget(this.currentShape);
