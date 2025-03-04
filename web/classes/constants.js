@@ -1,4 +1,5 @@
 const GAME_STATES = {
+    WAITING_FOR_START: "waitingForStart",
     SHOWING_TARGET: "showingTarget",
     DRAWING: "drawing",
     DONE: "done",

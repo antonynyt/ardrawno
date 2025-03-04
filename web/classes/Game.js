@@ -127,14 +127,10 @@ class Game {
 
             // Add a "Play Again" option
             this.ui.displayEndMessage("FINI! Appuyez sur le bouton pour rejouer", this.width);
-            this.serialManager.sendReset();
-        }
-    }
-
-    // Add a method to clean up resources when the game ends or page unloads
-    cleanup() {
-        if (this.serialManager) {
-            this.serialManager.close();
+            if (this.serialManager.isButtonPressed()) {
+                this.serialManager.sendReset();
+                this.gameState = GAME_STATES.WAITING_FOR_START;
+            }
         }
     }
 }
