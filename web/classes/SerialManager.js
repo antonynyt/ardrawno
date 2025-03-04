@@ -13,7 +13,7 @@ class SerialManager {
         this.currentWeight = 20;
         this.prevDeltaX = 0;
         this.prevDeltaY = 0;
-        this.isConnected = false;
+        this.gameStarted = false;
     }
 
     setup(canvasWidth, canvasHeight, onDataReceived) {
@@ -23,21 +23,48 @@ class SerialManager {
         this.canvasHeight = canvasHeight;
         this.onDataReceived = onDataReceived;
 
-        this.serial.on("connected", () => console.log("Connected"));
+        this.serial.on("connected", () => {
+            console.log("Connected");
+        });
+
         this.serial.on("open", () => console.log("Port open"));
+
         this.serial.on("data", () => this.serialEvent());
+
         this.serial.on("error", (err) => console.log("Serial error:", err));
-        this.serial.on("close", () => console.log("Port closed"));
+
+        this.serial.on("close", () => {
+            console.log("Port closed");
+        });
 
         this.serial.list();
         this.serial.open(this.portName);
+    }
+
+    async close() {
+        if (this.serial) {
+            await this.serial.close();
+        }
     }
 
     serialEvent() {
         this.rawData = this.serial.readLine();
         if (!this.rawData) return;
 
-        let values = this.rawData.split(",");
+        // Check if it's a START message
+        if (this.rawData.trim() === "START") {
+            this.gameStarted = true;
+            console.log("Game started by Arduino");
+            return;
+        }
+
+        // Only process DATA: messages
+        if (!this.rawData.startsWith("DATA:")) return;
+
+        // Remove the prefix
+        const dataStr = this.rawData.substring(5);
+
+        let values = dataStr.split(",");
         if (values.length === 4) {
             let deltaX = Number(values[0]);
             let deltaY = Number(values[1]);
@@ -82,23 +109,33 @@ class SerialManager {
         return this.currentWeight;
     }
 
-    sendShapeName(shapeName) {
-        // Placeholder for future implementation
-        // Format: "NAME:[shapeName]"
-        if (this.isConnected) {
-            console.log(`Would send shape name: ${shapeName}`);
-            // this.serial.write(`NAME:${shapeName}\n`);
+    isGameStarted() {
+        return this.gameStarted;
+    }
+
+    async sendCommand(command) {
+        if (this.serial) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(command + '\n');
+            try {
+                await this.serial.write(data);
+            } catch (error) {
+                console.error('Error sending command:', error);
+            }
         }
     }
 
-    sendTimeData(timeRemaining) {
-        // Placeholder for future implementation
-        // Format: "TIME:[seconds]"
-        if (this.isConnected) {
-            const seconds = Math.ceil(timeRemaining / 1000);
-            console.log(`Would send time remaining: ${seconds}s`);
-            // this.serial.write(`TIME:${seconds}\n`);
-        }
+    async sendShapeName(shapeName) {
+        await this.sendCommand(`SHAPE:${shapeName}`);
+    }
+
+    async sendDifficulty(difficulty) {
+        await this.sendCommand(`DIFF:${difficulty}`);
+    }
+
+    async sendReset() {
+        await this.sendCommand("RESET");
+        this.gameStarted = false;
     }
 }
 

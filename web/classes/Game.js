@@ -10,7 +10,7 @@ import UI from "./UI.js";
 
 class Game {
     constructor() {
-        this.gameState = GAME_STATES.SHOWING_TARGET;
+        this.gameState = GAME_STATES.WAITING_FOR_START;
         this.startTime = 0;
         this.remainingTime = 0;
 
@@ -20,7 +20,7 @@ class Game {
         this.ui = new UI();
 
         this.currentShape = null;
-        this.difficulty = "beginner";
+        this.difficulty = "easy";
         this.width = window.innerWidth / 1.10;
         this.height = window.innerHeight / 1.20;
     }
@@ -41,7 +41,6 @@ class Game {
             this.height,
             this.handleSerialData.bind(this)
         );
-        this.startTime = millis();
     }
 
     handleSerialData(x, y, buttonPressed, weight) {
@@ -65,17 +64,32 @@ class Game {
             this.width,
             this.height
         );
+        
+        // Send new shape information to Arduino immediately
+        console.log(this.currentShape.name);
+        this.serialManager.sendShapeName(this.currentShape.name);
+        this.serialManager.sendDifficulty(this.difficulty);
+        
         this.gameState = GAME_STATES.SHOWING_TARGET;
         this.startTime = millis();
         this.drawing.clearPath();
-
-        // TODO: send shape name through serial
-        this.serialManager.sendShapeName(this.currentShape.name);
     }
 
     draw() {
         background("#faebd7");
 
+        // First state: waiting for Arduino button press
+        if (this.gameState === GAME_STATES.WAITING_FOR_START) {
+            this.ui.displayWaitingMessage();
+            
+            if (this.serialManager.isGameStarted()) {
+                console.log("Game started from Arduino signal");
+                this.newGame();  // This will set gameState to SHOWING_TARGET
+            }
+            return;
+        }
+        
+        // The rest of the game flow
         if (this.gameState === GAME_STATES.SHOWING_TARGET) {
             this.drawing.drawTarget(this.currentShape);
             this.ui.displayShapeName(this.currentShape.name, this.width);
@@ -105,12 +119,22 @@ class Game {
                 this.width
             );
         } else if (this.gameState === GAME_STATES.DONE) {
-
             // Show both the drawing and target for comparison
             this.drawing.drawTarget(this.currentShape);
             this.drawing.drawPath();
 
-            //TODO: save drawing to API
+            //TODO: SEND DRAWING TO API
+
+            // Add a "Play Again" option
+            this.ui.displayEndMessage("FINI! Appuyez sur le bouton pour rejouer", this.width);
+            this.serialManager.sendReset();
+        }
+    }
+
+    // Add a method to clean up resources when the game ends or page unloads
+    cleanup() {
+        if (this.serialManager) {
+            this.serialManager.close();
         }
     }
 }

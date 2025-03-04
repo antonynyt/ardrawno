@@ -43,6 +43,24 @@ class UI {
         text(`Draw a ${shapeName}`, canvasWidth / 2, 20);
         pop();
     }
+
+    displayWaitingMessage() {
+        push();
+        textAlign(CENTER, CENTER);
+        fill(0);
+        textSize(16);
+        text("Appuyez sur le bouton de l'Arduino pour commencer", width/2, height/2 + 40);
+        pop();
+    }
+
+    displayEndMessage(message, canvasWidth) {
+        push();
+        textAlign(CENTER, CENTER);
+        textSize(24);
+        fill(0);
+        text(message, canvasWidth/2, 50);
+        pop();
+    }
 }
 
 export default UI;

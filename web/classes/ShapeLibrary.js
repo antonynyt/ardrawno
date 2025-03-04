@@ -1,23 +1,23 @@
 class ShapeLibrary {
     constructor() {
         this.shapes = {
-            beginner: [
+            easy: [
                 {
-                    name: "Square",
+                    name: "Carre",
                     path: (width, height) => this.generateSquare(width, height),
                     strokeWidths: [3],
                 },
             ],
-            intermediate: [                
+            medium: [                
                 {
-                    name: "Circle",
+                    name: "Cercle",
                     path: (width, height) => this.generateCircle(width, height),
                     strokeWidths: [3],
                 },
             ],
-            advanced: [
+            hard: [
                 {
-                    name: "Star",
+                    name: "Etoile",
                     path: (width, height) => this.generateStar(width, height),
                     strokeWidths: [3, 5, 3, 5, 3],
                 },
@@ -26,9 +26,9 @@ class ShapeLibrary {
         this.currentShape = null;
     }
 
-    getRandomShape(difficulty = "beginner") {
+    getRandomShape(difficulty = "easy") {
         if (!this.shapes[difficulty]) {
-            difficulty = "beginner";
+            difficulty = "easy";
         }
 
         const availableShapes = this.shapes[difficulty];
