@@ -23,6 +23,10 @@ class Game {
         this.difficulty = "easy";
         this.width = window.innerWidth / 1.10;
         this.height = window.innerHeight / 1.20;
+
+        // Prevents restarts immediately after finishing
+        // false by default, set to true when game is done and if button is pressed
+        this.needsButtonRelease = false;
     }
 
     setup() {
@@ -103,6 +107,9 @@ class Game {
 
             if (this.remainingTime <= 0) {
                 this.gameState = GAME_STATES.DONE;
+                if (this.serialManager.isButtonPressed()) {
+                    this.needsButtonRelease = true;
+                }
             }
 
             // Target shape is not displayed during drawing
@@ -125,9 +132,16 @@ class Game {
 
             //TODO: SEND DRAWING TO API
 
-            // Add a "Play Again" option
             this.ui.displayEndMessage("FINI! Appuyez sur le bouton pour rejouer", this.width);
-            if (this.serialManager.isButtonPressed()) {
+
+            if (this.needsButtonRelease) {
+                if (!this.serialManager.isButtonPressed()) {
+                    // Button has been released, now we can accept a new press
+                    this.needsButtonRelease = false;
+                }
+            } 
+            // Only handle a new button press if we don't need to wait for release
+            else if (this.serialManager.isButtonPressed()) {
                 this.serialManager.sendReset();
                 this.gameState = GAME_STATES.WAITING_FOR_START;
             }

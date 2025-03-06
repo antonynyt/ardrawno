@@ -60,13 +60,14 @@ void loop() {
   
   switch (gameState) {
     case WAITING_FOR_START:
-      updateDifficultySelection();
+      updateDifficultySelection(); // also show waiting message
+
       if (buttonState && !oldBtnState) {
         gameState = RUNNING;
-        Serial.print("START:"); // start with difficulty level
-        Serial.println(difficultyLevels[currentDifficultyIndex]);
         displayMessage("REGARDEZ L'ECRAN");
         delay(1000);
+        Serial.print("START:"); // start with difficulty level
+        Serial.println(difficultyLevels[currentDifficultyIndex]);
       }
       break;
       
