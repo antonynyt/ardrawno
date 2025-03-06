@@ -1,17 +1,35 @@
 #include <LiquidCrystal.h>
-#include "EncoderHandler.h"
-#include "LCDHandler.h"
-#include "SerialHandler.h"
 
+// LCD pin definitions
+#define LCD_RS 7
+#define LCD_EN 6
+#define LCD_D4 5
+#define LCD_D5 4
+#define LCD_D6 3
+#define LCD_D7 2
+#define BUFFER_SIZE 64
 #define FSR_THRESHOLD 10
+#define BUTTON_PIN 8 // draw and start button pin
+const int FSR_PIN = A2; // force sensitive resistor pin
 
 enum GameState {
   WAITING_FOR_START,
   RUNNING
 };
 
-const int BUTTON_PIN = 8; // draw and start button pin
-const int FSR_PIN = A2; // force sensitive resistor pin
+struct GameInfo {
+  char word[20];
+  char difficulty[12];
+  bool hasNewData;
+};
+
+struct Encoder {
+  int pin_clk; // Clock pin is the pin that sends the signal to the microcontroller when the encoder is rotated.
+  int pin_dt; // Data pin is the pin that sends the signal to the microcontroller when the encoder is rotated.
+  int counter;
+  bool direction;
+  int last_clk;
+};
 
 int oldFsr = 0, oldBtnState = 0;
 
