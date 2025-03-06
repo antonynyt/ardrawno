@@ -14,13 +14,6 @@
 // Initialize LCD
 extern LiquidCrystal lcd;
 
-// Custom block symbols
-extern byte full[8];
-extern byte four[8];
-extern byte three[8];
-extern byte two[8];
-extern byte one[8];
-
 // Initialize LCD and custom characters
 void initLCD();
 

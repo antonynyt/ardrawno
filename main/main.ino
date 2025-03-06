@@ -3,6 +3,8 @@
 #include "LCDHandler.h"
 #include "SerialHandler.h"
 
+#define FSR_THRESHOLD 10
+
 enum GameState {
   WAITING_FOR_START,
   RUNNING
@@ -86,32 +88,32 @@ void loop() {
 void sendSensorData(int buttonState) {
   bool valueChanged = false;
 
-  // Mise à jour des encodeurs et détection d'un changement
+  // Encoder change detection
   for (int i = 0; i < numEncoders; i++) {
-    int oldValue = encoderValues[i]; // Stocke l'ancienne valeur
+    int oldValue = encoderValues[i];
     updateEncoder(encoders[i], encoderValues[i]);
 
     if (encoderValues[i] != oldValue) {
-      valueChanged = true; // Détecte un changement
+      valueChanged = true;
     }
   }
 
-  // ── Lecture du capteur de pression (FSR) ──
-  int FsrValue = analogRead(FSR_PIN);
-  if (FsrValue != oldFsr) {
+  // FSR change detection
+  int fsrValue = analogRead(FSR_PIN);
+  if (abs(fsrValue - oldFsr) > FSR_THRESHOLD) {
     valueChanged = true;
-    oldFsr = FsrValue; // Mise à jour de l'ancienne valeur
+    oldFsr = fsrValue;
   }
 
   if (valueChanged || buttonState != oldBtnState) {
     Serial.print("DATA:");
-    Serial.print(encoderValues[0]); // Encodeur gauche
+    Serial.print(encoderValues[0]); // Left encoder
     Serial.print(",");
-    Serial.print(encoderValues[1]); // Encodeur droit
+    Serial.print(encoderValues[1]); // Right encoder
     Serial.print(",");
     Serial.print(buttonState);
     Serial.print(",");
-    Serial.println(oldFsr);
+    Serial.println(fsrValue);
   }
 }
 
@@ -124,23 +126,27 @@ void initEncoder(Encoder &enc) {
 
 void updateEncoder(Encoder &enc, int &storedValue) {
   int current_clk = digitalRead(enc.pin_clk);
-  // Vérifier un changement d'état du signal CLK
+  
+  // A change indicates the encoder is rotating
   if (current_clk != enc.last_clk) {
-    delayMicroseconds(500);  // Petit délai pour éviter les rebonds
-    // Vérification du sens de rotation
-    if (digitalRead(enc.pin_dt) != current_clk) {  
+    delayMicroseconds(800);
+    current_clk = digitalRead(enc.pin_clk); //to ensure stable reading after debounce
+    
+    if (digitalRead(enc.pin_dt) != current_clk) {  // detect clockwise rotation
       enc.counter++;
       enc.direction = true;
     } else {       
       enc.counter--;
       enc.direction = false;
     }
-    storedValue = enc.counter; // Mettre à jour la valeur stockée
+    storedValue = enc.counter;
   }
-  enc.last_clk = current_clk;  // Mise à jour de la dernière valeur lue
+  enc.last_clk = current_clk; 
 }
 
 //LCD implementation
+// ----------------
+
 void displayMessage(const char* message) {
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -182,6 +188,8 @@ void displayGameInfo(const char* word, const char* difficulty) {
 }
 
 // Incoming serial processing implementation
+// ----------------
+
 void processSerial(GameInfo& gameInfo) {
   if (Serial.available() > 0) {
     while (Serial.available() > 0) {
@@ -201,6 +209,7 @@ void processSerial(GameInfo& gameInfo) {
   }
 }
 
+// Parse incoming serial data
 void parseSerialData(char* buffer, GameInfo& gameInfo) {
   // Check if string is 6 characters long and starts with "SHAPE:"
   if (strncmp(buffer, "SHAPE:", 6) == 0) {
