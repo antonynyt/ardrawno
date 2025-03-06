@@ -15,6 +15,7 @@ class SerialManager {
         this.prevDeltaY = 0;
         this.gameStarted = false;
         this.isConnected = false;
+        this.difficulty = "easy";
     }
 
     setup(canvasWidth, canvasHeight, onDataReceived) {
@@ -54,7 +55,8 @@ class SerialManager {
         if (!this.rawData) return;
 
         // Check if it's a START message
-        if (this.rawData.trim() === "START") {
+        if (this.rawData.trim().startsWith("START:")) {
+            this.difficulty = this.rawData.trim().substring(5);
             this.gameStarted = true;
             console.log("Game started by Arduino");
             return;
@@ -110,20 +112,16 @@ class SerialManager {
     isGameStarted() {
         return this.gameStarted;
     }
+    
+    getDifficulty() {
+        return this.difficulty;
+    }
 
     sendShapeName(shapeName) {
         // Format: "NAME:[shapeName]"
         if (this.isConnected) {
             console.log(`sent shape name: ${shapeName}`);
             this.serial.write(`SHAPE:${shapeName}\n`);
-        }
-    }
-
-    sendDifficulty(difficulty) {
-        // Format: "DIFF:[difficulty]"
-        if (this.isConnected) {
-            console.log(`sent difficulty: ${difficulty}`);
-            this.serial.write(`DIFF:${difficulty}\n`);
         }
     }
 

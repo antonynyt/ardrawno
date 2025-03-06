@@ -27,6 +27,7 @@ class ShapeLibrary {
     }
 
     getRandomShape(difficulty = "easy") {
+        difficulty = difficulty.toLowerCase();
         if (!this.shapes[difficulty]) {
             difficulty = "easy";
         }

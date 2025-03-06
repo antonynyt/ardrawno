@@ -68,7 +68,6 @@ class Game {
         // Send new shape information to Arduino immediately
         console.log(this.currentShape.name);
         this.serialManager.sendShapeName(this.currentShape.name);
-        this.serialManager.sendDifficulty(this.difficulty);
         
         this.gameState = GAME_STATES.SHOWING_TARGET;
         this.startTime = millis();
@@ -83,6 +82,7 @@ class Game {
             this.ui.displayWaitingMessage();
             
             if (this.serialManager.isGameStarted()) {
+                this.difficulty = this.serialManager.getDifficulty();
                 console.log("Game started from Arduino signal");
                 this.newGame();  // This will set gameState to SHOWING_TARGET
             }
