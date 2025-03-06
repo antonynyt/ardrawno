@@ -3,33 +3,34 @@
 #include "LCDHandler.h"
 #include "SerialHandler.h"
 
-// Game states
 enum GameState {
   WAITING_FOR_START,
   RUNNING
 };
 
-const int BUTTON_PIN = 8;
-const int FSR_PIN = A2;
+const int BUTTON_PIN = 8; // draw and start button pin
+const int FSR_PIN = A2; // force sensitive resistor pin
+
+int oldFsr = 0, oldBtnState = 0;
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
-// Définition des encodeurs (modifier selon ton setup)
 Encoder encoders[] = {
   {13, 12, 0, true, 0},  // Encodeur de gauche (leftEncoder)
   {11, 10, 0, true, 0}   // Encodeur de droite (rightEncoder)
 };
 
-const int numEncoders = 2;  // Nombre total d'encodeurs
+const int numEncoders = 2;
 int encoderValues[numEncoders] = {0}; // Stocke les valeurs pour affichage unique
 
-// Game information
 GameInfo gameInfo = {"", "EASY", false};
 GameState gameState = WAITING_FOR_START;
 
 // Buffer for serial input
+// holds chars as they arrive one by one from the serial connection
+// allows to collect partial messages until a complete command is received, rather than processing one character at a time
 char inputBuffer[BUFFER_SIZE];
-int bufferIndex = 0;
+int bufferIndex = 0; // Increments as each character is added to the buffer
 
 void setup() {
   Serial.begin(9600);
@@ -37,16 +38,14 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(FSR_PIN, INPUT);
 
-  initLCD();
+  lcd.begin(16, 2); //init LCD
   displayWaitingMessage();
 
-  // Initialisation de tous les encodeurs
+  // Init all encoders
   for (int i = 0; i < numEncoders; i++) {
     initEncoder(encoders[i]);
   }
 }
-
-int oldFsr = 0, oldBtnState = 0;
 
 void loop() {
   // Process any incoming serial data
@@ -55,31 +54,25 @@ void loop() {
   // Check button state for game start
   int buttonState = !digitalRead(BUTTON_PIN);
   
-  // State machine for game
   switch (gameState) {
     case WAITING_FOR_START:
       if (buttonState && !oldBtnState) {
-        // Button was just pressed, start the game
-        Serial.println("START");
         gameState = RUNNING;
+        Serial.println("START"); // Notify the server
         displayMessage("REGARDEZ L'ECRAN");
         delay(1000);
       }
       break;
       
     case RUNNING:
-      // Normal game operation
       sendSensorData(buttonState);
-      
-      // Update LCD every second with game info if new data available
       if (gameInfo.hasNewData) {
-        displayGameInfo(gameInfo.word, gameInfo.difficulty);
+        displayGameInfo(gameInfo.word, gameInfo.difficulty); //update LCD
         gameInfo.hasNewData = false;
       }
       break;
   }
   
-  // Store the button state for the next iteration
   oldBtnState = buttonState;
 }
 
@@ -141,11 +134,6 @@ void updateEncoder(Encoder &enc, int &storedValue) {
   enc.last_clk = current_clk;  // Mise à jour de la dernière valeur lue
 }
 
-// LCD implementation
-void initLCD() {
-  lcd.begin(16, 2);
-}
-
 void displayMessage(const char* message) {
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -175,7 +163,7 @@ void processSerial(GameInfo& gameInfo) {
     while (Serial.available() > 0) {
       char c = Serial.read();
       
-      // Add to buffer if not end of message
+      // Adds characters to the buffer until it receives a newline character
       if (c != '\n' && bufferIndex < BUFFER_SIZE - 1) {
         inputBuffer[bufferIndex++] = c;
       } 
@@ -190,12 +178,13 @@ void processSerial(GameInfo& gameInfo) {
 }
 
 void parseSerialData(char* buffer, GameInfo& gameInfo) {
-  // Check if it's a shape
+  // Check if string is 6 characters long and starts with "SHAPE:"
   if (strncmp(buffer, "SHAPE:", 6) == 0) {
+    // Copy the word into the game info struct
     strncpy(gameInfo.word, buffer + 6, sizeof(gameInfo.word) - 1);
     gameInfo.hasNewData = true;
   }
-  // Check if it's a difficulty
+  // Check if string is 5 characters long and starts with "DIFF:"
   else if (strncmp(buffer, "DIFF:", 5) == 0) {
     strncpy(gameInfo.difficulty, buffer + 5, sizeof(gameInfo.difficulty) - 1);
     gameInfo.hasNewData = true;
