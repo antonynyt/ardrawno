@@ -7,6 +7,11 @@ class ShapeLibrary {
                     path: (width, height) => this.generateSquare(width, height),
                     strokeWidths: [3],
                 },
+                {
+                    name: "Triangle",
+                    path: (width, height) => this.generateTriangle(width, height),
+                    strokeWidths: [3],
+                }
             ],
             medium: [                
                 {
@@ -14,13 +19,18 @@ class ShapeLibrary {
                     path: (width, height) => this.generateCircle(width, height),
                     strokeWidths: [3],
                 },
+                {
+                    name: "Fleche",
+                    path: (width, height) => this.generateArrow(width, height),
+                    strokeWidths: [3, 10, 3],
+                }
             ],
             hard: [
                 {
                     name: "Etoile",
                     path: (width, height) => this.generateStar(width, height),
-                    strokeWidths: [3, 5, 3, 5, 3],
-                },
+                    strokeWidths: [3, 10, 3, 10, 3],
+                }
             ],
         };
         this.currentShape = null;
@@ -93,6 +103,32 @@ class ShapeLibrary {
 
         points.push(points[0]); // Close the shape
         return points;
+    }
+
+    generateTriangle(width, height) {
+        const size = Math.min(width, height) * 0.3;
+        const cx = width / 2, cy = height / 2;
+        return [
+            createVector(cx, cy - size),
+            createVector(cx + size, cy + size),
+            createVector(cx - size, cy + size),
+            createVector(cx, cy - size)
+        ];
+    }
+
+    generateArrow(width, height) {
+        const size = Math.min(width, height) * 0.3;
+        const cx = width / 2, cy = height / 2;
+        return [
+            // Shaft
+            createVector(cx - size, cy),
+            createVector(cx + size * 0.5, cy),
+            // Arrowhead
+            createVector(cx + size * 0.5, cy - size * 0.5),
+            createVector(cx + size, cy),
+            createVector(cx + size * 0.5, cy + size * 0.5),
+            createVector(cx + size * 0.5, cy)
+        ];
     }
 }
 
