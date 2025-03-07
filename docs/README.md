@@ -33,7 +33,7 @@ KY-040 Rotary Encoders
 
 ### Schéma
 
-![Description de l'image](/docs/assets/schematics_bb.png)
+![Description de l'image](/docs/assets/schema_bb.jpg)
 
 ### BOM
 
@@ -43,6 +43,7 @@ KY-040 Rotary Encoders
 | 2   | Breadboard     | 1        | Plaque de prototypage                  | [Lien](#)                                                     |
 | 3   | KY-040         | 2        | Encodeur Rotatif                       | [BastelGarage](https://www.bastelgarage.ch/encodeur-rotatif-ky-040)   |
 | 4   | FSR402         | 1        | Capteur de force                       | [Lien](#)   |
+| 5   | Button         | 1        | Bouton avec un cache de couleur        | [Lien](#)   |
 
 ## Programme
 
