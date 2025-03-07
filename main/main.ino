@@ -46,8 +46,9 @@ int encoderValues[numEncoders] = {0}; // Stocke les valeurs pour affichage uniqu
 const char* difficultyLevels[] = {"EASY", "MEDIUM", "HARD"};
 const int numDifficulties = 3;
 int currentDifficultyIndex = 0; // Default to EASY
+int oldDifficultyIndex = -1;
 
-GameInfo gameInfo = {"", difficultyLevels[0], false};
+GameInfo gameInfo = {"", difficultyLevels[currentDifficultyIndex], false};
 GameState gameState = WAITING_FOR_START;
 
 // Buffer for serial input
@@ -80,7 +81,7 @@ void loop() {
   
   switch (gameState) {
     case WAITING_FOR_START:
-      updateDifficultySelection(); // also show waiting message
+      updateDifficultySelection();
 
       if (buttonState && !oldBtnState) {
         gameState = RUNNING;
@@ -177,23 +178,39 @@ void displayWaitingMessage() {
   lcd.print("Start: Button");
   lcd.setCursor(0, 1);
   lcd.print("Diff: ");
-  lcd.print(difficultyLevels[currentDifficultyIndex]);
+  lcd.print("EASY");
 }
 
 void updateDifficultySelection() {
-  // Update encoder values
+  // Store previous value to detect changes
+  int oldValue = encoderValues[0];
+  
+  // Use the existing updateEncoder function
   updateEncoder(encoders[0], encoderValues[0]);
-  // Check for clockwise rotation
-  if (encoders[0].direction) {
-    currentDifficultyIndex = (currentDifficultyIndex + 1) % numDifficulties;
+  
+  // Only process if encoder value has changed
+  if (encoderValues[0] != oldValue) {
+    // Save previous difficulty for display comparison
+    oldDifficultyIndex = currentDifficultyIndex;
+    
+    // Determine if rotation was clockwise or counterclockwise
+    if (encoderValues[0] > oldValue) {
+      // Clockwise - move to next difficulty
+      currentDifficultyIndex = (currentDifficultyIndex + 1) % numDifficulties;
+    } else {
+      // Counterclockwise - move to previous difficulty
+      // Add numDifficulties before modulo to ensure positive value
+      currentDifficultyIndex = (currentDifficultyIndex - 1 + numDifficulties) % numDifficulties;
+    }
+    
+    // Update gameInfo with the new difficulty
+    strcpy(gameInfo.difficulty, difficultyLevels[currentDifficultyIndex]);
+    
+    // Update LCD display with new difficulty
+    lcd.setCursor(6, 1);
+    lcd.print(difficultyLevels[currentDifficultyIndex]);
+    lcd.print("  "); // Clear any remaining characters
   }
-  // Check for counter-clockwise rotation
-  if (!encoders[0].direction) {
-    currentDifficultyIndex = (currentDifficultyIndex - 1 + numDifficulties) % numDifficulties;
-  }
-  // Update the gameInfo with selected difficulty
-  strcpy(gameInfo.difficulty, difficultyLevels[currentDifficultyIndex]);
-  displayWaitingMessage();
 }
 
 void displayGameInfo(const char* word, const char* difficulty) {

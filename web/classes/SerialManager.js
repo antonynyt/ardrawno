@@ -56,7 +56,7 @@ class SerialManager {
 
         // Check if it's a START message
         if (this.rawData.trim().startsWith("START:")) {
-            this.difficulty = this.rawData.trim().substring(5);
+            this.difficulty = this.rawData.trim().substring(6);
             this.gameStarted = true;
             console.log("Game started by Arduino");
             return;
@@ -75,7 +75,7 @@ class SerialManager {
             this.prevButtonPressed = this.buttonPressed;
             this.buttonPressed = Number(values[2]) === 1;
             let fsrValue = Number(values[3]) || 0;
-            this.currentWeight = map(fsrValue, 0, 70, 10, 50);
+            this.currentWeight = map(fsrValue, 0, 1300, 3, 10);
 
             if (deltaX > this.prevDeltaX) this.x += PIXEL_SCALE;
             else if (deltaX < this.prevDeltaX) this.x -= PIXEL_SCALE;

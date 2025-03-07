@@ -86,7 +86,7 @@ class Game {
             this.ui.displayWaitingMessage();
             
             if (this.serialManager.isGameStarted()) {
-                this.difficulty = this.serialManager.getDifficulty();
+                this.difficulty = this.serialManager.getDifficulty().toLocaleLowerCase();
                 console.log("Game started from Arduino signal");
                 this.newGame();  // This will set gameState to SHOWING_TARGET
             }
