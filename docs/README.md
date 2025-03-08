@@ -40,7 +40,7 @@ Le circuit utilise principalement les composants suivants:
 | Réf | Composant      | Quantité | Description                            | Fournisseur / Lien                                            |
 | --- | -------------- | -------- | -------------------------------------- | ------------------------------------------------------------- |
 | 1   | Arduino Mega 2560 | 1        | Microcontrôleur ATmega2560             | [Arduino](https://store.arduino.cc/products/arduino-mega-2560-rev3) |
-| 2   | Breadboard     | 1        | Plaque de prototypage                  |                                                     |
+| 2   | Breadboard     | 3        | Plaque de prototypage                  |                                                     |
 | 3   | KY-040         | 2        | Encodeur Rotatif                       | [BastelGarage](https://www.bastelgarage.ch/encodeur-rotatif-ky-040)   |
 | 4   | FSR402         | 1        | Capteur de force                       |   |
 | 5   | Button         | 1        | Bouton avec un cache de couleur        |   |
@@ -67,14 +67,14 @@ Le programme est réalisé en HTML, CSS et JavaScript avec la librairie p5.js. J
 ### Marche à suivre
 
 1. Connecter le Arduino et lancer p5.serialControl.
-2. 
+2. Modifiez le fichier `/web/classes/constants.js` pour indiquer le port USB correct:
    ```javascript
    const SERIAL_PORT = '/dev/tty.usbmodem14201'; // Remplacez par votre port
    ```
 2. Ouvrir le jeu web dans le navigateur, avec liveServer de VScode (par exemple).
 3. Dessiner!
 
-Retrouvez le guide d'installation complet pour modifier le projet dans le fichier [INSTALLATION.MD](docs/INSTALLATION.MD).
+Retrouvez le guide d'installation complet pour modifier le projet dans le fichier [INSTALLATION.MD](/docs/INSTALLATION.MD).
 
 ### Contrôles
 
