@@ -74,7 +74,7 @@ Le programme est réalisé en HTML, CSS et JavaScript avec la librairie p5.js. J
 2. Ouvrir le jeu web dans le navigateur, avec liveServer de VScode (par exemple).
 3. Dessiner!
 
-Retrouvez le guide d'installation complet pour modifier le projet dans le fichier [INSTALLATION.MD](/docs/INSTALLATION.MD).
+Retrouvez le guide d'installation complet pour modifier le projet dans le fichier [INSTALLATION.MD](/docs/INSTALLATION.md).
 
 ### Contrôles
 
