@@ -19,7 +19,11 @@ Retrouvez la documentation dans le dossier [docs](docs/).
 
 ## Photos
 
-![](/docs/assets/video.mp4)
+
+
+https://github.com/user-attachments/assets/9016710e-096b-463b-923a-413ef48c173d
+
+
 ![](/docs/assets/3boxes.jpg)
 ![](/docs/assets/web-ui.jpg)
 
