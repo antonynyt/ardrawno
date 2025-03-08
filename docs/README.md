@@ -25,7 +25,7 @@ Avec ce projet, je voulais aussi explorer la modélisation et l’impression 3D.
 ![circuit sur breadboard avec écran LCD écrit Draw: carré](/docs/assets/early-circuit-2.jpg)
 
 Le circuit utilise principalement les composants suivants:
-- **Arduino Mega 2560**
+- **Arduino Mega 2560**: Initialement, je voulais connecter un écran. J'aurais eu besoin de plus de broches digital, d'où le choix de la Mega.
 - **Écran LCD 16x2**: Affiche les instructions, le modèle à dessiner et le temps restant
 - **Encodeurs rotatifs KY-040**: Permettent de contrôler les positions X et Y du curseur de dessin
 - **Capteur de force FSR402**: Détecte la pression appliquée pour modifier l'épaisseur du trait
