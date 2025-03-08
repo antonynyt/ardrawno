@@ -40,7 +40,7 @@ class UI {
         noStroke();
         fill(0);
         textAlign(CENTER, TOP);
-        text(`Dessinez: ${shapeName}`, canvasWidth / 2, 20);
+        text(`Memorisez: ${shapeName}`, canvasWidth / 2, 20);
         pop();
     }
 

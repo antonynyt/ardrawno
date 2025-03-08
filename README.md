@@ -1,6 +1,6 @@
 # ArDRAWno: Dessinons!
 
-![Description de l'image](/docs/assets/photo-de-mon-projet.png)
+![](/docs/assets/cover.jpg)
 
 Réalisé par Antony Neyret
 Option Arduino 2025 – COMEM+
@@ -16,3 +16,10 @@ La difficulté varie selon la communication des joueurs.
 ## Documentation
 
 Retrouvez la documentation dans le dossier [docs](docs/).
+
+## Photos
+
+![](/docs/assets/video.mp4)
+![](/docs/assets/3boxes.jpg)
+![](/docs/assets/web-ui.jpg)
+
